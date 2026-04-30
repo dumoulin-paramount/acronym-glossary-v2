@@ -301,15 +301,12 @@ async function atCreate(table, fields) {
 }
 
 async function atUpdate(table, recordId, fields) {
-  const body = JSON.stringify({ fields });
-  console.log('atUpdate', table, recordId, body);
   const r = await fetch(`${AIRTABLE_BASE}/${encodeURIComponent(table)}/${recordId}`, {
     method: 'PATCH',
     headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
-    body,
+    body: JSON.stringify({ fields }),
   });
   const d = await r.json();
-  console.log('atUpdate response', JSON.stringify(d));
   if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
   return d;
 }
