@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paramount / Pluto TV Acronym Glossary</title>
+  <script src="https://accounts.google.com/gsi/client" async></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue: #003366;
+      --blue-mid: #0057a8;
+      --blue-light: #e8f0fb;
+      --accent: #0096ff;
+      --text: #1a1a2e;
+      --muted: #6b7280;
+      --border: #dde3ec;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    header { background: linear-gradient(135deg, var(--blue) 0%, var(--blue-mid) 100%); color: white; padding: 20px 32px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+    .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    header h1 { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.3px; }
+    header p  { font-size: 0.85rem; opacity: 0.75; margin-top: 4px; }
+    .search-bar { padding: 16px 0 0; max-width: 560px; }
+    .search-bar input {
+      width: 100%; padding: 10px 16px 10px 42px; font-size: 0.95rem;
+      border: 2px solid rgba(255,255,255,0.3); border-radius: 8px;
+      background: rgba(255,255,255,0.15); color: white; outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' fill='none' stroke='%23ffffff' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: 14px center;
+    }
+    .search-bar input::placeholder { color: rgba(255,255,255,0.6); }
+    .search-bar input:focus { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.22); }
+    .tabs { display: flex; padding: 14px 0 0; }
+    .tab-btn { padding: 10px 24px; font-size: 0.92rem; font-weight: 600; border: none; cursor: pointer; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); border-radius: 8px 8px 0 0; transition: all 0.2s; }
+    .tab-btn.active { background: var(--bg); color: var(--blue); }
+    .tab-btn:hover:not(.active) { background: rgba(255,255,255,0.2); color: white; }
+
+    .user-bar { display: flex; align-items: center; gap: 8px; flex-shrink: 0; padding-top: 2px; }
+    .user-avatar { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); }
+    .user-name { font-size: 0.8rem; color: rgba(255,255,255,0.9); font-weight: 600; white-space: nowrap; }
+    .btn-signout { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 3px 10px; font-size: 0.73rem; cursor: pointer; transition: background 0.15s; }
+    .btn-signout:hover { background: rgba(255,255,255,0.28); }
+    .google-signin-btn { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; font-size: 0.8rem; font-weight: 600; background: white; color: #3c4043; border: 1.5px solid rgba(255,255,255,0.6); border-radius: 6px; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+    .google-signin-btn:hover { background: #f1f3f4; }
+
+    main { padding: 24px 32px 80px; }
+    .stats-bar { display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: var(--muted); margin-bottom: 18px; flex-wrap: wrap; }
+    .stats-bar strong { color: var(--text); }
+    .btn-add { display: inline-flex; align-items: center; gap: 6px; padding: 7px 16px; font-size: 0.82rem; font-weight: 700; background: var(--blue-mid); color: white; border: none; border-radius: 20px; cursor: pointer; transition: background 0.15s; }
+    .btn-add:hover { background: var(--blue); }
+    .btn-refresh { display: inline-flex; align-items: center; gap: 5px; padding: 6px 13px; font-size: 0.78rem; font-weight: 600; background: var(--card); color: var(--muted); border: 1.5px solid var(--border); border-radius: 20px; cursor: pointer; transition: all 0.15s; }
+    .btn-refresh:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-refresh.spinning svg { animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status-msg { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .status-msg .icon { font-size: 2.2rem; display: block; margin-bottom: 10px; }
+    .status-msg p { font-size: 0.9rem; }
+    .status-msg a { color: var(--accent); text-decoration: none; }
+
+    #tab-alpha { display: block; }
+    #tab-categories { display: none; }
+    .alpha-index { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .alpha-index a { display: inline-block; width: 32px; height: 32px; line-height: 32px; text-align: center; font-size: 0.82rem; font-weight: 700; color: var(--blue-mid); border: 1.5px solid var(--border); border-radius: 6px; text-decoration: none; background: var(--card); transition: all 0.15s; }
+    .alpha-index a:hover { background: var(--blue-mid); color: white; border-color: var(--blue-mid); }
+    .alpha-index a.disabled { color: var(--border); pointer-events: none; border-color: #eee; background: #fafafa; }
+    .letter-section { margin-bottom: 8px; }
+    .letter-anchor { font-size: 1.15rem; font-weight: 800; color: var(--blue); padding: 8px 0 4px; border-bottom: 2px solid var(--blue-light); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+    .letter-anchor span.count { font-size: 0.72rem; font-weight: 500; color: var(--muted); background: var(--blue-light); padding: 2px 8px; border-radius: 12px; }
+    .acronym-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 10px; }
+
+    .acronym-card, .cat-card { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 13px 16px; cursor: pointer; position: relative; transition: border-color 0.15s, box-shadow 0.15s; }
+    .acronym-card:hover, .cat-card:hover { border-color: var(--accent); box-shadow: 0 2px 10px rgba(0,150,255,0.1); }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+    .acr-name { font-size: 1.05rem; font-weight: 800; color: var(--blue); letter-spacing: 0.02em; }
+    .cat-card .acr-name { font-size: 0.98rem; }
+    .acr-def  { font-size: 0.83rem; color: var(--text); line-height: 1.5; }
+    .cat-card .acr-def { font-size: 0.8rem; }
+    .acr-cat  { display: inline-block; font-size: 0.7rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-top: 7px; letter-spacing: 0.02em; }
+    .edit-hint { opacity: 0; font-size: 0.7rem; color: var(--accent); font-weight: 600; transition: opacity 0.15s; white-space: nowrap; padding-left: 8px; padding-top: 2px; }
+    .acronym-card:hover .edit-hint, .cat-card:hover .edit-hint { opacity: 1; }
+    .contrib-badge { display: inline-block; font-size: 0.63rem; font-weight: 700; background: #dbeafe; color: #1e40af; border-radius: 10px; padding: 1px 7px; margin-left: 6px; vertical-align: middle; }
+    .last-update { font-size: 0.68rem; color: var(--muted); margin-top: 6px; }
+    .acr-source { font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+    .acr-source a { color: var(--accent); text-decoration: none; }
+    .acr-source a:hover { text-decoration: underline; }
+    .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+    .card-footer .last-update { margin-top: 0; }
+    .vote-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: 1.5px solid var(--border); border-radius: 20px; padding: 3px 10px; font-size: 0.72rem; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.15s; font-family: inherit; flex-shrink: 0; }
+    .vote-btn:hover:not(.voted):not(.no-auth) { border-color: var(--accent); color: var(--accent); }
+    .vote-btn.voted { border-color: var(--accent); color: var(--accent); background: var(--blue-light); cursor: default; }
+    .vote-btn.no-auth { cursor: default; opacity: 0.55; }
+
+    .category-section { margin-bottom: 20px; border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--card); }
+    .category-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; cursor: pointer; user-select: none; transition: background 0.15s; }
+    .category-header:hover { background: var(--blue-light); }
+    .cat-title { font-size: 1rem; font-weight: 700; color: var(--blue); display: flex; align-items: center; gap: 10px; }
+    .cat-icon { font-size: 1.2rem; }
+    .cat-badge { font-size: 0.72rem; font-weight: 600; background: var(--blue-light); color: var(--blue-mid); padding: 2px 10px; border-radius: 12px; }
+    .cat-chevron { font-size: 0.8rem; color: var(--muted); transition: transform 0.2s; }
+    .category-section.open .cat-chevron { transform: rotate(180deg); }
+    .category-body { display: none; padding: 0 16px 16px; }
+    .category-section.open .category-body { display: block; }
+    .cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; margin-top: 12px; }
+    .cat-card { background: var(--bg); }
+
+    .no-results { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .no-results span { font-size: 2.5rem; display: block; margin-bottom: 12px; }
+
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,20,0.55); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: white; border-radius: 16px; width: 100%; max-width: 520px; box-shadow: 0 24px 64px rgba(0,0,0,0.28); transform: translateY(16px); transition: transform 0.2s; }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-header { padding: 20px 24px 16px; border-bottom: 1.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: 1.1rem; font-weight: 700; color: var(--blue); }
+    .modal-close { background: none; border: none; font-size: 1.4rem; color: var(--muted); cursor: pointer; line-height: 1; padding: 0 4px; }
+    .modal-close:hover { color: var(--text); }
+    .modal-body { padding: 20px 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { font-size: 0.75rem; font-weight: 700; color: var(--muted); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.06em; }
+    .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 10px 12px; font-size: 0.92rem; border: 1.5px solid var(--border); border-radius: 8px; outline: none; transition: border-color 0.15s; font-family: inherit; color: var(--text); background: white; }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: var(--accent); }
+    .form-group textarea { resize: vertical; min-height: 90px; line-height: 1.5; }
+    .modal-footer { padding: 16px 24px; border-top: 1.5px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+    .btn { padding: 9px 20px; font-size: 0.88rem; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s; font-family: inherit; }
+    .btn-primary { background: var(--blue-mid); color: white; }
+    .btn-primary:hover { background: var(--blue); }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
+    .btn-danger:hover { background: #fecaca; }
+    .btn-ghost { background: var(--bg); color: var(--muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); }
+    .modal-actions { display: flex; gap: 8px; }
+    .delete-confirm { font-size: 0.8rem; color: #b91c1c; background: #fee2e2; padding: 8px 14px; border-radius: 8px; display: none; align-items: center; gap: 10px; }
+    .delete-confirm.show { display: flex; }
+    .delete-confirm button { background: #b91c1c; color: white; border: none; border-radius: 6px; padding: 4px 12px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+
+    .signin-required { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px; padding: 14px 20px; margin-bottom: 18px; font-size: 0.85rem; color: #92400e; display: none; align-items: center; gap: 10px; }
+    .signin-required.show { display: flex; }
+
+    .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(10px); background: #1e293b; color: white; padding: 10px 20px; border-radius: 10px; font-size: 0.85rem; font-weight: 600; z-index: 2000; opacity: 0; transition: opacity 0.2s, transform 0.2s; pointer-events: none; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 640px) {
+      header, main { padding-left: 16px; padding-right: 16px; }
+      .acronym-grid, .cat-grid { grid-template-columns: 1fr; }
+      .alpha-index a { width: 28px; height: 28px; line-height: 28px; font-size: 0.75rem; }
+      .header-top { flex-direction: column-reverse; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <h1>Paramount &amp; Pluto TV Acronym Glossary</h1>
+      <p>Collaborative glossary — sign in with your company Google account to add or edit acronyms</p>
+    </div>
+    <div class="user-bar" id="userBar">
+      <button id="signinBtn" class="google-signin-btn" onclick="signIn()" style="display:none">
+        <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+        Sign in with Google
+      </button>
+      <div id="userInfo" style="display:none;align-items:center;gap:8px;">
+        <img id="userAvatar" class="user-avatar" src="" alt="" />
+        <span id="userName" class="user-name"></span>
+        <button class="btn-signout" onclick="signOut()">Sign out</button>
+      </div>
+    </div>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search acronyms, definitions, categories, or who added them…" autocomplete="off" />
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('alpha', this)">A&ndash;Z Listing</button>
+    <button class="tab-btn" onclick="switchTab('categories', this)">By Category</button>
+  </div>
+</header>
+
+<main>
+  <div class="stats-bar">
+    <span id="statsText">Loading…</span>
+    <button class="btn-add" onclick="openAdd()">＋ Add Acronym</button>
+    <button class="btn-refresh" id="refreshBtn" onclick="loadAcronyms(true)" title="Refresh">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6"/><path d="M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+      Refresh
+    </button>
+  </div>
+
+  <div id="signinRequiredBanner" class="signin-required">
+    <span>&#x26A0;&#xFE0F;</span>
+    <span>Sign in with your company Google account to add or edit acronyms.</span>
+  </div>
+
+  <div id="tab-alpha">
+    <div class="alpha-index" id="alphaIndex"></div>
+    <div id="alphaList"><div class="status-msg"><span class="icon">⏳</span><p>Loading acronyms…</p></div></div>
+  </div>
+  <div id="tab-categories"><div id="catList"></div></div>
+</main>
+
+<div id="modalOverlay" class="modal-overlay" onclick="overlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Edit Acronym</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Acronym</label>
+        <input type="text" id="editAcronym" placeholder="e.g. DAI" autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label>Definition</label>
+        <textarea id="editDef" placeholder="Full name and description…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="editCat" onchange="onCatChange()"></select>
+      </div>
+      <div class="form-group" id="newCatGroup" style="display:none">
+        <label>New Category Name</label>
+        <input type="text" id="editNewCat" placeholder="Enter new category name" />
+      </div>
+      <div class="form-group">
+        <label>Source <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional — e.g. Slack, GDocs, Jira https://…)</span></label>
+        <input type="text" id="editSource" placeholder="e.g. Slack, GDocs, Initial Search" autocomplete="off" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div>
+        <div id="deleteConfirm" class="delete-confirm">
+          Permanently delete this entry?
+          <button onclick="confirmDelete()">Yes, delete</button>
+          <button onclick="cancelDelete()" style="background:transparent;color:#b91c1c;border:none;cursor:pointer;font-weight:600;padding:0">Cancel</button>
+        </div>
+        <button class="btn btn-danger" id="deleteBtn" onclick="showDeleteConfirm()" style="display:none">Delete</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveItem()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ─── CONFIGURATION ────────────────────────────────────────────────────────────
+const AIRTABLE_TOKEN   = 'patRTy3TUxVPkdUV0.10a2f9bf2d32edff24bd37b63e7b60437decb81bddcb3ec23069fc6cfc08fea3';
+const AIRTABLE_BASE    = 'https://api.airtable.com/v0/app84W20VN98UkckX';
+const GOOGLE_CLIENT_ID = '255902110630-qfjsu8njpgquvplu80rfpqhhr723uo0s.apps.googleusercontent.com';
+
+// ─── CATEGORY CONFIG ──────────────────────────────────────────────────────────
+const CAT_CONFIG = {
+  "Business & Revenue Metrics":   { icon: "📊", color: "#e0edff" },
+  "Advertising & Ad Tech":        { icon: "📢", color: "#fce8ff" },
+  "Streaming & Video Technology": { icon: "📺", color: "#e8ffe8" },
+  "Product & Engineering":        { icon: "⚙️",  color: "#fff3e0" },
+  "Regulatory & Compliance":      { icon: "⚖️",  color: "#ffe8e8" },
+  "Agile & Project Management":   { icon: "🗂️", color: "#e8f8ff" },
+  "Broadcast & Distribution":     { icon: "📡", color: "#f0ffe8" },
+  "HR & Administration":          { icon: "👥", color: "#fff8e8" },
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let currentUser = null;
+let tokenClient = null;
+let acronyms    = [];
+let currentTab  = 'alpha';
+let searchQuery = '';
+let editingId   = null;
+
+// ─── AIRTABLE API HELPERS ─────────────────────────────────────────────────────
+async function atGet(table, params = {}) {
+  const url = new URL(`${AIRTABLE_BASE}/${encodeURIComponent(table)}`);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  const r = await fetch(url, { headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` } });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d;
+}
+
+async function atCreate(table, fields) {
+  const r = await fetch(`${AIRTABLE_BASE}/${encodeURIComponent(table)}`, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ records: [{ fields }] })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d.records[0];
+}
+
+async function atUpdate(table, recordId, fields) {
+  const r = await fetch(`${AIRTABLE_BASE}/${encodeURIComponent(table)}/${recordId}`, {
+    method: 'PATCH',
+    headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fields })
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d;
+}
+
+async function atDelete(table, recordId) {
+  const r = await fetch(`${AIRTABLE_BASE}/${encodeURIComponent(table)}/${recordId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${AIRTABLE_TOKEN}` }
+  });
+  const d = await r.json();
+  if (d.error) throw new Error(d.error.message || JSON.stringify(d.error));
+  return d;
+}
+
+// ─── GOOGLE AUTH (identity for editing only) ──────────────────────────────────
+function initGoogleAuth() {
+  if (typeof google === 'undefined' || !google.accounts) { setTimeout(initGoogleAuth, 300); return; }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile',
+    callback: handleTokenResponse,
+  });
+  if (localStorage.getItem('gsi_signed_in')) {
+    tokenClient.requestAccessToken({ prompt: '' });
+  } else {
+    document.getElementById('signinBtn').style.display = 'inline-flex';
+  }
+}
+
+async function handleTokenResponse(response) {
+  if (response.error) {
+    localStorage.removeItem('gsi_signed_in');
+    document.getElementById('signinBtn').style.display = 'inline-flex';
+    return;
+  }
+  localStorage.setItem('gsi_signed_in', '1');
+  try {
+    const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { 'Authorization': `Bearer ${response.access_token}` }
+    }).then(r => r.json());
+    currentUser = {
+      email:      info.email      || '',
+      name:       info.name       || info.email,
+      given_name: info.given_name || (info.name || '').split(' ')[0],
+      picture:    info.picture    || '',
+    };
+    document.getElementById('signinBtn').style.display = 'none';
+    document.getElementById('signinRequiredBanner').classList.remove('show');
+    const avatar = document.getElementById('userAvatar');
+    if (currentUser.picture) avatar.src = currentUser.picture; else avatar.style.display = 'none';
+    document.getElementById('userName').textContent = currentUser.given_name;
+    document.getElementById('userInfo').style.display = 'flex';
+    if (!sessionStorage.getItem('visit_logged')) {
+      atCreate('VisitLog', { timestamp: new Date().toISOString(), user_email: currentUser.email, user_name: currentUser.name })
+        .catch(e => console.warn('VisitLog write failed:', e.message));
+      sessionStorage.setItem('visit_logged', '1');
+    }
+    renderCurrent();
+  } catch(e) {
+    console.error('Userinfo error:', e);
+    toast('Sign-in error — please try again');
+  }
+}
+
+function signIn() { tokenClient.requestAccessToken({ prompt: 'select_account' }); }
+
+function signOut() {
+  currentUser = null;
+  localStorage.removeItem('gsi_signed_in');
+  document.getElementById('userInfo').style.display = 'none';
+  document.getElementById('signinBtn').style.display = 'inline-flex';
+  renderCurrent();
+}
+
+// ─── DATA LOADING ─────────────────────────────────────────────────────────────
+async function loadAcronyms(manual) {
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  try {
+    let allRecords = [];
+    let offset     = null;
+    do {
+      const params = { pageSize: 100 };
+      if (offset) params.offset = offset;
+      const data = await atGet('Acronyms', params);
+      allRecords  = allRecords.concat(data.records || []);
+      offset      = data.offset || null;
+    } while (offset);
+
+    acronyms = allRecords
+      .map(r => ({
+        id:              String(r.fields.id              || ''),
+        a:               String(r.fields.acronym         || ''),
+        d:               String(r.fields.definition      || ''),
+        c:               String(r.fields.category        || ''),
+        added_by:        String(r.fields.added_by        || ''),
+        date_added:      String(r.fields.date_added      || ''),
+        last_updated:    String(r.fields.last_updated    || ''),
+        last_updated_by: String(r.fields.last_updated_by || ''),
+        source:          String(r.fields.source          || ''),
+        votes:           typeof r.fields.votes === 'number' ? r.fields.votes : 0,
+        _recId:          r.id,
+      }))
+      .filter(x => x.id);
+
+    renderCurrent();
+    if (manual) toast('Refreshed — ' + acronyms.length + ' acronyms loaded');
+  } catch(err) {
+    console.error('Load error:', err);
+    document.getElementById('alphaList').innerHTML =
+      `<div class="status-msg"><span class="icon">❌</span><p>Could not load acronyms: ${esc(err.message)}</p></div>`;
+    document.getElementById('statsText').textContent = 'Load failed';
+  }
+  btn.classList.remove('spinning');
+}
+
+function generateId() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function catColor(cat) { return (CAT_CONFIG[cat] || { color: '#f0f0f0' }).color; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function filtered() {
+  if (!searchQuery) return acronyms.slice();
+  const q = searchQuery.toLowerCase();
+  return acronyms.filter(x =>
+    x.a.toLowerCase().includes(q) ||
+    x.d.toLowerCase().includes(q) ||
+    x.c.toLowerCase().includes(q) ||
+    x.added_by.toLowerCase().includes(q)
+  );
+}
+
+function allCategories() {
+  const cats = new Set(Object.keys(CAT_CONFIG));
+  acronyms.forEach(x => cats.add(x.c));
+  return [...cats];
+}
+
+function contribBadge(item) {
+  if (!item.added_by || item.added_by === 'system') return '';
+  const name = item.added_by.split('@')[0].replace('.', ' ');
+  return `<span class="contrib-badge" title="Added by ${esc(item.added_by)}">+ ${esc(name)}</span>`;
+}
+
+function formatDate(isoStr) {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return '';
+  return `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}-${d.getFullYear()}`;
+}
+
+function lastUpdateLabel(item) {
+  const date      = item.last_updated || item.date_added;
+  const formatted = formatDate(date);
+  if (!formatted) return '';
+  const by      = item.last_updated ? item.last_updated_by : '';
+  const display = by ? by.split('@')[0].replace('.', ' ') : '';
+  return `<div class="last-update">Last update: ${formatted}${display ? ' by ' + esc(display) : ''}</div>`;
+}
+
+function sourceHtml(raw) {
+  if (!raw) return '';
+  const parts = raw.split(/(https?:\/\/[^\s,]+)/g);
+  return parts.map((p, i) => i % 2 === 0 ? esc(p) : `<a href="${p}" target="_blank">${esc(p)}</a>`).join('');
+}
+
+function sourceLabel(item) {
+  if (!item.source) return '';
+  return `<div class="acr-source">Source: ${sourceHtml(item.source)}</div>`;
+}
+
+function hasVoted(id) {
+  if (!currentUser) return false;
+  return JSON.parse(localStorage.getItem('voted_' + currentUser.email) || '[]').includes(id);
+}
+
+function voteButton(item) {
+  const count    = item.votes || 0;
+  const voted    = hasVoted(item.id);
+  const signedIn = !!currentUser;
+  const cls      = voted ? 'vote-btn voted' : signedIn ? 'vote-btn' : 'vote-btn no-auth';
+  const title    = voted ? 'Click to remove your upvote' : signedIn ? 'Upvote this acronym' : 'Sign in to upvote';
+  return `<button class="${cls}" onclick="voteAcronym('${esc(item.id)}',event)" title="${title}">👍 ${count}</button>`;
+}
+
+// ─── VOTE ─────────────────────────────────────────────────────────────────────
+async function voteAcronym(id, event) {
+  event.stopPropagation();
+  if (!currentUser) { toast('Sign in to upvote acronyms'); return; }
+
+  const item     = acronyms.find(x => x.id === id);
+  if (!item) return;
+
+  const removing = hasVoted(id);
+  const newCount = removing ? Math.max(0, (item.votes || 0) - 1) : (item.votes || 0) + 1;
+  const action   = removing ? 'remove' : 'add';
+
+  try {
+    await atUpdate('Acronyms', item._recId, { votes: newCount });
+    await atCreate('VoteLog', {
+      timestamp:  new Date().toISOString(),
+      user_email: currentUser.email,
+      user_name:  currentUser.name,
+      acronym_id: id,
+      acronym:    item.a,
+      action,
+    });
+    item.votes = newCount;
+    const key   = 'voted_' + currentUser.email;
+    const voted = JSON.parse(localStorage.getItem(key) || '[]');
+    if (removing) { const i = voted.indexOf(id); if (i > -1) voted.splice(i, 1); }
+    else voted.push(id);
+    localStorage.setItem(key, JSON.stringify(voted));
+    renderCurrent();
+    toast(removing ? 'Upvote removed' : '👍 Upvoted!');
+  } catch(err) {
+    console.error('Vote error:', err);
+    toast('Vote failed: ' + err.message);
+  }
+}
+
+// ─── LOG EDIT ─────────────────────────────────────────────────────────────────
+function logEdit(id, acronym, action, fieldChanges, summary) {
+  atCreate('EditLog', {
+    timestamp:     new Date().toISOString(),
+    user_email:    currentUser.email,
+    user_name:     currentUser.name,
+    acronym_id:    id,
+    acronym,
+    action,
+    field_changed: fieldChanges.map(c => c.field).join(' | '),
+    old_value:     fieldChanges.map(c => c.oldVal).join(' | '),
+    new_value:     fieldChanges.map(c => c.newVal).join(' | '),
+    summary,
+  }).catch(e => console.warn('EditLog write failed:', e.message));
+}
+
+// ─── CARDS ────────────────────────────────────────────────────────────────────
+function alphaCard(item) {
+  return `<div class="acronym-card" onclick="openEdit('${esc(item.id)}')">
+    <div class="card-top">
+      <div class="acr-name">${esc(item.a)}${contribBadge(item)}</div>
+      <span class="edit-hint">✏ edit</span>
+    </div>
+    <div class="acr-def">${esc(item.d)}</div>
+    <span class="acr-cat" style="background:${catColor(item.c)};color:#333">${esc(item.c)}</span>
+    ${sourceLabel(item)}
+    <div class="card-footer">${lastUpdateLabel(item)}${voteButton(item)}</div>
+  </div>`;
+}
+
+function catCard(item) {
+  return `<div class="cat-card" onclick="openEdit('${esc(item.id)}')">
+    <div class="card-top">
+      <div class="acr-name">${esc(item.a)}${contribBadge(item)}</div>
+      <span class="edit-hint">✏ edit</span>
+    </div>
+    <div class="acr-def">${esc(item.d)}</div>
+    ${sourceLabel(item)}
+    <div class="card-footer">${lastUpdateLabel(item)}${voteButton(item)}</div>
+  </div>`;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function renderAlpha() {
+  const list  = filtered().sort((a, b) => a.a.localeCompare(b.a));
+  const total = acronyms.length;
+  document.getElementById('statsText').innerHTML =
+    `Showing <strong>${list.length}</strong> of <strong>${total}</strong> acronyms`;
+
+  const alphaList  = document.getElementById('alphaList');
+  const alphaIndex = document.getElementById('alphaIndex');
+
+  if (acronyms.length === 0) {
+    alphaIndex.innerHTML = '';
+    alphaList.innerHTML  = '<div class="status-msg"><span class="icon">⏳</span><p>Loading…</p></div>';
+    return;
+  }
+  if (list.length === 0) {
+    alphaIndex.innerHTML = '';
+    alphaList.innerHTML  = `<div class="no-results"><span>🔍</span>No acronyms match "<em>${esc(searchQuery)}</em>"</div>`;
+    return;
+  }
+
+  const byLetter = {};
+  for (const item of list) {
+    const l = item.a[0].toUpperCase();
+    if (!byLetter[l]) byLetter[l] = [];
+    byLetter[l].push(item);
+  }
+
+  alphaIndex.innerHTML = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l =>
+    byLetter[l] ? `<a href="#letter-${l}">${l}</a>` : `<a class="disabled">${l}</a>`
+  ).join('');
+
+  alphaList.innerHTML = Object.entries(byLetter).map(([letter, items]) => `
+    <div class="letter-section" id="letter-${letter}">
+      <div class="letter-anchor">${letter}<span class="count">${items.length}</span></div>
+      <div class="acronym-grid">${items.map(alphaCard).join('')}</div>
+    </div>`).join('');
+}
+
+function renderCategories() {
+  const list  = filtered();
+  const total = acronyms.length;
+  document.getElementById('statsText').innerHTML =
+    `Showing <strong>${list.length}</strong> of <strong>${total}</strong> acronyms`;
+
+  const catList = document.getElementById('catList');
+  if (list.length === 0) {
+    catList.innerHTML = `<div class="no-results"><span>🔍</span>No acronyms match "<em>${esc(searchQuery)}</em>"</div>`;
+    return;
+  }
+
+  const byCat = {};
+  for (const item of list) {
+    if (!byCat[item.c]) byCat[item.c] = [];
+    byCat[item.c].push(item);
+  }
+
+  const ordered = Object.keys(CAT_CONFIG).filter(c => byCat[c]);
+  const extra   = Object.keys(byCat).filter(c => !CAT_CONFIG[c]);
+
+  catList.innerHTML = [...ordered, ...extra].map(cat => {
+    const items = (byCat[cat] || []).sort((a, b) => a.a.localeCompare(b.a));
+    const cfg   = CAT_CONFIG[cat] || { icon: '📌', color: '#f0f0f0' };
+    return `<div class="category-section open" style="border-top:4px solid ${cfg.color}">
+      <div class="category-header" onclick="toggleCat(this)">
+        <div class="cat-title"><span class="cat-icon">${cfg.icon}</span>${esc(cat)}<span class="cat-badge">${items.length}</span></div>
+        <span class="cat-chevron">▼</span>
+      </div>
+      <div class="category-body">
+        <div class="cat-grid">${items.map(catCard).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCat(header) { header.closest('.category-section').classList.toggle('open'); }
+function renderCurrent() { if (currentTab === 'alpha') renderAlpha(); else renderCategories(); }
+
+// ─── MODAL ────────────────────────────────────────────────────────────────────
+function populateCatSelect(selectedCat) {
+  const sel  = document.getElementById('editCat');
+  const cats = allCategories();
+  sel.innerHTML = cats.map(c =>
+    `<option value="${esc(c)}" ${c === selectedCat ? 'selected' : ''}>${esc(c)}</option>`
+  ).join('') + `<option value="__new__">＋ New category…</option>`;
+}
+
+function onCatChange() {
+  const val = document.getElementById('editCat').value;
+  document.getElementById('newCatGroup').style.display = val === '__new__' ? 'block' : 'none';
+  if (val === '__new__') document.getElementById('editNewCat').focus();
+}
+
+function openEdit(id) {
+  const item = acronyms.find(x => x.id === id);
+  if (!item) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Acronym';
+  document.getElementById('editAcronym').value = item.a;
+  document.getElementById('editDef').value     = item.d;
+  document.getElementById('editSource').value  = item.source || '';
+  populateCatSelect(item.c);
+  document.getElementById('newCatGroup').style.display = 'none';
+  document.getElementById('deleteBtn').style.display   = 'inline-flex';
+  document.getElementById('deleteConfirm').classList.remove('show');
+  showModal();
+}
+
+function openAdd() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'Add Acronym';
+  document.getElementById('editAcronym').value = '';
+  document.getElementById('editDef').value     = '';
+  document.getElementById('editSource').value  = '';
+  populateCatSelect(allCategories()[0]);
+  document.getElementById('newCatGroup').style.display = 'none';
+  document.getElementById('deleteBtn').style.display   = 'none';
+  document.getElementById('deleteConfirm').classList.remove('show');
+  showModal();
+  setTimeout(() => document.getElementById('editAcronym').focus(), 80);
+}
+
+function showModal()  { document.getElementById('modalOverlay').classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; editingId = null; }
+function overlayClick(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+// ─── SAVE ─────────────────────────────────────────────────────────────────────
+async function saveItem() {
+  const raw    = document.getElementById('editAcronym').value.trim();
+  const def    = document.getElementById('editDef').value.trim();
+  const catSel = document.getElementById('editCat').value;
+  const cat    = catSel === '__new__' ? document.getElementById('editNewCat').value.trim() : catSel;
+  const source = document.getElementById('editSource').value.trim();
+
+  if (!raw) { flashField('editAcronym'); return; }
+  if (!def) { flashField('editDef');     return; }
+  if (!cat) { flashField(catSel === '__new__' ? 'editNewCat' : 'editCat'); return; }
+
+  if (!currentUser) {
+    document.getElementById('signinRequiredBanner').classList.add('show');
+    closeModal();
+    return;
+  }
+
+  const saveBtn = document.querySelector('.btn-primary');
+  saveBtn.disabled = true;
+  try {
+    if (editingId === null) {
+      const id  = generateId();
+      const now = new Date().toISOString();
+      const rec = await atCreate('Acronyms', {
+        id, acronym: raw, definition: def, category: cat,
+        added_by: currentUser.email, date_added: now,
+        last_updated: now, last_updated_by: currentUser.email,
+        source, votes: 0,
+      });
+      logEdit(id, raw, 'add', [], `Added '${raw}' | Definition: '${def}' | Category: '${cat}'${source ? ' | Source: \'' + source + '\'' : ''}`);
+      acronyms.push({ id, a: raw, d: def, c: cat, added_by: currentUser.email,
+        date_added: now, last_updated: now, last_updated_by: currentUser.email,
+        source, votes: 0, _recId: rec.id });
+      toast('Acronym added ✓');
+    } else {
+      const item       = acronyms.find(x => x.id === editingId);
+      const newVals    = { acronym: raw, definition: def, category: cat, source };
+      const oldVals    = { acronym: item.a, definition: item.d, category: item.c, source: item.source };
+      const stateKey   = { acronym: 'a', definition: 'd', category: 'c', source: 'source' };
+      const fieldLabel = { acronym: 'Acronym', definition: 'Definition', category: 'Category', source: 'Source' };
+
+      const fieldChanges = [];
+      for (const field of ['acronym', 'definition', 'category', 'source']) {
+        if (newVals[field] !== oldVals[field])
+          fieldChanges.push({ field, oldVal: oldVals[field], newVal: newVals[field] });
+      }
+      if (fieldChanges.length === 0) { toast('No changes made'); closeModal(); return; }
+
+      const now          = new Date().toISOString();
+      const updateFields = { last_updated: now, last_updated_by: currentUser.email };
+      for (const { field, newVal } of fieldChanges) {
+        updateFields[field] = newVal;
+        item[stateKey[field]] = newVal;
+      }
+      await atUpdate('Acronyms', item._recId, updateFields);
+
+      const origAcronym  = oldVals.acronym;
+      const summaryParts = fieldChanges.map(({ field, oldVal, newVal }) =>
+        `${fieldLabel[field]}: '${oldVal}' → '${newVal}'`);
+      logEdit(editingId, origAcronym, 'edit', fieldChanges,
+        `Edited '${origAcronym}': ${summaryParts.join(' | ')}`);
+      item.last_updated    = now;
+      item.last_updated_by = currentUser.email;
+      toast('Changes saved ✓');
+    }
+    closeModal();
+    renderCurrent();
+  } catch(err) {
+    console.error('Save error:', err);
+    toast('Save failed: ' + err.message);
+  } finally {
+    saveBtn.disabled = false;
+  }
+}
+
+// ─── DELETE ───────────────────────────────────────────────────────────────────
+function showDeleteConfirm() { document.getElementById('deleteBtn').style.display = 'none'; document.getElementById('deleteConfirm').classList.add('show'); }
+function cancelDelete()      { document.getElementById('deleteConfirm').classList.remove('show'); document.getElementById('deleteBtn').style.display = 'inline-flex'; }
+
+async function confirmDelete() {
+  if (!editingId) return;
+  const item = acronyms.find(x => x.id === editingId);
+  if (!item) return;
+  try {
+    logEdit(editingId, item.a, 'delete', [], `Deleted acronym '${item.a}'`);
+    await atDelete('Acronyms', item._recId);
+    acronyms = acronyms.filter(x => x.id !== editingId);
+    closeModal();
+    renderCurrent();
+    toast('Acronym deleted');
+  } catch(err) {
+    console.error('Delete error:', err);
+    toast('Delete failed: ' + err.message);
+  }
+}
+
+// ─── UI HELPERS ───────────────────────────────────────────────────────────────
+function flashField(id) {
+  const el = document.getElementById(id);
+  el.style.borderColor = '#dc2626';
+  el.focus();
+  setTimeout(() => { el.style.borderColor = ''; }, 1800);
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-alpha').style.display      = tab === 'alpha'      ? 'block' : 'none';
+  document.getElementById('tab-categories').style.display = tab === 'categories' ? 'block' : 'none';
+  renderCurrent();
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  searchQuery = this.value.trim();
+  renderCurrent();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('open')) {
+    if (document.activeElement.tagName !== 'TEXTAREA') saveItem();
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+loadAcronyms();   // loads immediately — no sign-in needed to view
+initGoogleAuth(); // sets up sign-in for editing
+</script>
+</body>
+</html>
