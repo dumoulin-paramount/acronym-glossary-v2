@@ -730,7 +730,7 @@ async function saveItem() {
         id, acronym: raw, definition: def, category: cat,
         added_by: currentUser.email, date_added: now,
         last_updated: now, last_updated_by: currentUser.email,
-        source, votes: 0,
+        source,
       });
       logEdit(id, raw, 'add', [], `Added '${raw}' | Definition: '${def}' | Category: '${cat}'${source ? ' | Source: \'' + source + '\'' : ''}`);
       acronyms.push({ id, a: raw, d: def, c: cat, added_by: currentUser.email,
