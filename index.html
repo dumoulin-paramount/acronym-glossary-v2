@@ -910,9 +910,8 @@ async function submitFeedback() {
   const text = document.getElementById('feedbackText').value.trim();
   if (!text) { toast('Please enter some feedback first'); return; }
   const user_email = currentUser?.email || 'anonymous';
-  const user_name  = currentUser?.name  || 'Anonymous';
   try {
-    await atCreate('FeedbackLog', { timestamp: new Date().toISOString(), user_email, user_name, feedback: text });
+    await atCreate('FeedbackLog', { timestamp: new Date().toISOString(), user_email: 'Anonymous User', user_name: 'Anonymous User', feedback: text });
     fetch('https://formsubmit.co/ajax/robert.dumoulin@paramount.com', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
