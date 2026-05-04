@@ -185,7 +185,7 @@
     </div>
   </div>
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search acronyms, definitions, categories, or who added them…" autocomplete="off" />
+    <input type="text" id="searchInput" placeholder="Search acronyms, definitions, categories, most upvoted or who added them…" autocomplete="off" />
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('alpha', this)">A&ndash;Z Listing</button>
@@ -471,8 +471,13 @@ function generateId() {
 function catColor(cat) { return (CAT_CONFIG[cat] || { color: '#f0f0f0' }).color; }
 function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+function isPopularitySearch() {
+  const q = searchQuery.toLowerCase();
+  return /most.*(upvot|like|popular|voted)|top.*(rated|upvot|like)|upvot|most popular|popular|most liked/.test(q);
+}
+
 function filtered() {
-  if (!searchQuery) return acronyms.slice();
+  if (!searchQuery || isPopularitySearch()) return acronyms.slice();
   const q = searchQuery.toLowerCase();
   return acronyms.filter(x =>
     x.a.toLowerCase().includes(q) ||
@@ -689,7 +694,36 @@ function renderCategories() {
 }
 
 function toggleCat(header) { header.closest('.category-section').classList.toggle('open'); }
-function renderCurrent() { if (currentTab === 'alpha') renderAlpha(); else renderCategories(); }
+
+function renderPopular() {
+  const sorted = acronyms.slice().sort((a, b) => (b.votes || 0) - (a.votes || 0) || a.a.localeCompare(b.a));
+  document.getElementById('alphaIndex').innerHTML = '';
+  document.getElementById('statsText').innerHTML =
+    `Showing <strong>${sorted.length}</strong> acronyms by most upvoted`;
+
+  document.getElementById('alphaList').innerHTML = `
+    <div class="category-section open" style="border-top:4px solid #f59e0b">
+      <div class="category-header">
+        <div class="cat-title"><span class="cat-icon">⭐</span>Most Upvoted<span class="cat-badge">${sorted.length}</span></div>
+      </div>
+      <div class="category-body" style="display:block">
+        <div class="cat-grid">${sorted.map(item => {
+          const count = item.votes || 0;
+          const card  = catCard(item);
+          return card.replace('class="acr-name"', `class="acr-name" data-pop="true"`)
+                     .replace('</div>', `<div style="font-size:0.72rem;color:#f59e0b;font-weight:700;margin-top:4px">▲ ${count} upvote${count !== 1 ? 's' : ''}</div></div>`);
+        }).join('')}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('tab-alpha').style.display      = 'block';
+  document.getElementById('tab-categories').style.display = 'none';
+}
+
+function renderCurrent() {
+  if (isPopularitySearch()) { renderPopular(); return; }
+  if (currentTab === 'alpha') renderAlpha(); else renderCategories();
+}
 
 // ─── MODAL ────────────────────────────────────────────────────────────────────
 function populateCatSelect(selectedCat) {
