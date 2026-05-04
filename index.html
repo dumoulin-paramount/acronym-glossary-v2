@@ -495,6 +495,11 @@ function allCategories() {
 
 function contribBadge(item) {
   if (!item.added_by || item.added_by === 'system') return '';
+  if (item.added_by === 'weekly-bot') {
+    const d = item.date_added ? new Date(item.date_added) : null;
+    const dateStr = d && !isNaN(d) ? `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(2)}` : '';
+    return `<span class="contrib-badge" title="Added by weekly bot">+ weekly-bot${dateStr ? ' ' + dateStr : ''}</span>`;
+  }
   const name = item.added_by.split('@')[0].replace('.', ' ');
   return `<span class="contrib-badge" title="Added by ${esc(item.added_by)}">+ ${esc(name)}</span>`;
 }
