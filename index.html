@@ -473,7 +473,7 @@ function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').re
 
 function isPopularitySearch() {
   const q = searchQuery.toLowerCase();
-  return /most.*(upvot|like|popular|voted)|top.*(rated|upvot|like)|upvot|most popular|popular|most liked/.test(q);
+  return /most.*(upvot|like|popular|voted)|top.*(rated|upvot|like)|upvot|most popular|popular|most liked|best|amazing|favorite|favourite|highest|trending|top pick|loved|celebrated/.test(q);
 }
 
 function filtered() {
