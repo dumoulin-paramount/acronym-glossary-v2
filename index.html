@@ -47,6 +47,14 @@
     .user-name { font-size: 0.8rem; color: rgba(255,255,255,0.9); font-weight: 600; white-space: nowrap; }
     .btn-signout { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 3px 10px; font-size: 0.73rem; cursor: pointer; transition: background 0.15s; }
     .btn-signout:hover { background: rgba(255,255,255,0.28); }
+    .btn-feedback { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 3px 10px; font-size: 0.73rem; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
+    .btn-feedback:hover { background: rgba(255,255,255,0.28); }
+    .feedback-section-title { font-size: 0.95rem; font-weight: 700; color: var(--blue); margin-bottom: 10px; }
+    .star-row { display: flex; gap: 6px; margin-bottom: 14px; }
+    .star { font-size: 2rem; cursor: pointer; color: #d1d5db; transition: color 0.1s; line-height: 1; user-select: none; }
+    .star.lit { color: #f59e0b; }
+    .feedback-divider { border: none; border-top: 1.5px solid var(--border); margin: 20px 0; }
+    .char-count { font-size: 0.72rem; color: var(--muted); text-align: right; margin-top: 4px; }
     .google-signin-btn { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; font-size: 0.8rem; font-weight: 600; background: white; color: #3c4043; border: 1.5px solid rgba(255,255,255,0.6); border-radius: 6px; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
     .google-signin-btn:hover { background: #f1f3f4; }
 
@@ -164,6 +172,7 @@
       <p>Collaborative glossary — sign in with your company Google account to add or edit acronyms</p>
     </div>
     <div class="user-bar" id="userBar">
+      <button class="btn-feedback" onclick="openFeedbackModal()">Rate / Provide Feedback</button>
       <button id="signinBtn" class="google-signin-btn" onclick="signIn()" style="display:none">
         <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
         Sign in with Google
@@ -248,6 +257,33 @@
         <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
         <button class="btn btn-primary" onclick="saveItem()">Save</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="feedbackOverlay" class="modal-overlay" onclick="feedbackOverlayClick(event)">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">Rate / Provide Feedback</div>
+      <button class="modal-close" onclick="closeFeedbackModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="feedback-section-title">Rate The Acronym Glossary</div>
+      <div class="star-row" id="starRow">
+        <span class="star" data-v="1" onclick="selectStar(1)" onmouseenter="hoverStar(1)" onmouseleave="unhoverStar()">★</span>
+        <span class="star" data-v="2" onclick="selectStar(2)" onmouseenter="hoverStar(2)" onmouseleave="unhoverStar()">★</span>
+        <span class="star" data-v="3" onclick="selectStar(3)" onmouseenter="hoverStar(3)" onmouseleave="unhoverStar()">★</span>
+        <span class="star" data-v="4" onclick="selectStar(4)" onmouseenter="hoverStar(4)" onmouseleave="unhoverStar()">★</span>
+        <span class="star" data-v="5" onclick="selectStar(5)" onmouseenter="hoverStar(5)" onmouseleave="unhoverStar()">★</span>
+      </div>
+      <button class="btn btn-primary" onclick="submitRating()">Submit Rating</button>
+      <hr class="feedback-divider" />
+      <div class="feedback-section-title">Provide Feedback / Bugs</div>
+      <div class="form-group" style="margin-bottom:4px">
+        <textarea id="feedbackText" maxlength="500" placeholder="Describe your feedback or bug report…" style="min-height:100px" oninput="document.getElementById('charCount').textContent=this.value.length"></textarea>
+      </div>
+      <div class="char-count"><span id="charCount">0</span> / 500</div>
+      <button class="btn btn-primary" onclick="submitFeedback()" style="margin-top:10px">Submit Feedback</button>
     </div>
   </div>
 </div>
@@ -832,11 +868,61 @@ document.getElementById('searchInput').addEventListener('input', function() {
 });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Escape') { closeModal(); closeFeedbackModal(); }
   if (e.key === 'Enter' && document.getElementById('modalOverlay').classList.contains('open')) {
     if (document.activeElement.tagName !== 'TEXTAREA') saveItem();
   }
 });
+
+// ─── FEEDBACK / RATING ────────────────────────────────────────────────────────
+let selectedRating = 0;
+
+function openFeedbackModal() {
+  selectedRating = 0;
+  renderStars(0);
+  document.getElementById('feedbackText').value = '';
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('feedbackOverlay').classList.add('open');
+}
+function closeFeedbackModal() { document.getElementById('feedbackOverlay').classList.remove('open'); }
+function feedbackOverlayClick(e) { if (e.target === document.getElementById('feedbackOverlay')) closeFeedbackModal(); }
+
+function selectStar(n) { selectedRating = n; renderStars(n); }
+function hoverStar(n)  { renderStars(n); }
+function unhoverStar() { renderStars(selectedRating); }
+function renderStars(n) {
+  document.querySelectorAll('#starRow .star').forEach((s, i) => s.classList.toggle('lit', i < n));
+}
+
+async function submitRating() {
+  if (!selectedRating) { toast('Please select a star rating first'); return; }
+  const user_email = currentUser?.email || 'anonymous';
+  const user_name  = currentUser?.name  || 'Anonymous';
+  try {
+    await atCreate('RatingLog', { timestamp: new Date().toISOString(), user_email, user_name, rating: selectedRating });
+    toast('Rating submitted — thank you!');
+    selectedRating = 0;
+    renderStars(0);
+  } catch(e) { toast('Rating failed: ' + e.message); }
+}
+
+async function submitFeedback() {
+  const text = document.getElementById('feedbackText').value.trim();
+  if (!text) { toast('Please enter some feedback first'); return; }
+  const user_email = currentUser?.email || 'anonymous';
+  const user_name  = currentUser?.name  || 'Anonymous';
+  try {
+    await atCreate('FeedbackLog', { timestamp: new Date().toISOString(), user_email, user_name, feedback: text });
+    fetch('https://formsubmit.co/ajax/robert.dumoulin@paramount.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ subject: 'Acronym Glossary Feedback from ' + user_email, message: text, _replyto: user_email }),
+    }).catch(() => {});
+    document.getElementById('feedbackText').value = '';
+    document.getElementById('charCount').textContent = '0';
+    toast('Feedback submitted — thank you!');
+  } catch(e) { toast('Feedback failed: ' + e.message); }
+}
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 loadAcronyms();   // loads immediately — no sign-in needed to view
