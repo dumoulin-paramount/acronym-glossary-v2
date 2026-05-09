@@ -185,7 +185,7 @@
     </div>
   </div>
   <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search acronyms, definitions, categories, most upvoted or who added them…" autocomplete="off" />
+    <input type="text" id="searchInput" placeholder="Search acronyms, definitions, categories, most upvoted, newest, or who added them…" autocomplete="off" />
   </div>
   <div class="tabs">
     <button class="tab-btn active" onclick="switchTab('alpha', this)">A&ndash;Z Listing</button>
@@ -476,8 +476,13 @@ function isPopularitySearch() {
   return /most.*(upvot|like|popular|voted)|top.*(rated|upvot|like)|upvot|most popular|popular|most liked|best|amazing|favorite|favourite|highest|trending|top pick|loved|celebrated/.test(q);
 }
 
+function isNewestSearch() {
+  const q = searchQuery.toLowerCase();
+  return /newest|latest|recent|just added|new arrivals?|last added|most recent|newly|this week|fresh/.test(q);
+}
+
 function filtered() {
-  if (!searchQuery || isPopularitySearch()) return acronyms.slice();
+  if (!searchQuery || isPopularitySearch() || isNewestSearch()) return acronyms.slice();
   const q = searchQuery.toLowerCase();
   return acronyms.filter(x =>
     x.a.toLowerCase().includes(q) ||
@@ -725,8 +730,42 @@ function renderPopular() {
   document.getElementById('tab-categories').style.display = 'none';
 }
 
+function renderNewest() {
+  const sorted = acronyms.slice().sort((a, b) => {
+    const da = a.date_added ? new Date(a.date_added).getTime() : 0;
+    const db = b.date_added ? new Date(b.date_added).getTime() : 0;
+    return db - da || a.a.localeCompare(b.a);
+  });
+  document.getElementById('alphaIndex').innerHTML = '';
+  document.getElementById('statsText').innerHTML =
+    `Showing <strong>${sorted.length}</strong> acronyms by most recently added`;
+
+  document.getElementById('alphaList').innerHTML = `
+    <div class="category-section open" style="border-top:4px solid #6366f1">
+      <div class="category-header">
+        <div class="cat-title"><span class="cat-icon">🆕</span>Recently Added<span class="cat-badge">${sorted.length}</span></div>
+      </div>
+      <div class="category-body" style="display:block">
+        <div class="cat-grid">${sorted.map(item => {
+          const d = item.date_added ? new Date(item.date_added) : null;
+          const dateStr = d && !isNaN(d)
+            ? `${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(2)}`
+            : '';
+          const card = catCard(item);
+          return dateStr
+            ? card.replace('</div>', `<div style="font-size:0.72rem;color:#6366f1;font-weight:700;margin-top:4px">📅 Added ${dateStr}</div></div>`)
+            : card;
+        }).join('')}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('tab-alpha').style.display      = 'block';
+  document.getElementById('tab-categories').style.display = 'none';
+}
+
 function renderCurrent() {
   if (isPopularitySearch()) { renderPopular(); return; }
+  if (isNewestSearch())     { renderNewest();  return; }
   if (currentTab === 'alpha') renderAlpha(); else renderCategories();
 }
 
